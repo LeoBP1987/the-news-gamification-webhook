@@ -1,4 +1,5 @@
 from rest_framework import viewsets, filters, status, generics
+from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User, Group
 from rest_framework.response import Response
 from datetime import datetime
@@ -119,6 +120,7 @@ class WebhookViewSet(generics.ListAPIView):
     """
     queryset = Acessos.objects.all().order_by('leitor')
     serializer_class = AcessosSerializers
+    permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
 
