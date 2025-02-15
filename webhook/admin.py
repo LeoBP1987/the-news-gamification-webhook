@@ -12,21 +12,21 @@ class PostsAdmin(admin.ModelAdmin):
 admin.site.register(Posts, PostsAdmin)
 
 class AcessosAdmin(admin.ModelAdmin):
-    list_display= ('leitor', 'id_post', 'abertura')
-    list_display_links= ('leitor', 'id_post', 'abertura')
+    list_display= ('leitor', 'id_post', 'abertura_dia', 'abertura_hora')
+    list_display_links= ('leitor', 'id_post', 'abertura_dia', 'abertura_hora')
     list_per_page = 10
-    list_filter = ('leitor__email', 'id_post__id_post', 'abertura')
-    search_fields = ('leitor__email', 'id_post__id_post', 'abertura')
-    ordering = ('leitor', 'id_post', 'abertura')
+    list_filter = ('leitor__email', 'id_post__id_post', 'abertura_dia', 'abertura_hora')
+    search_fields = ('leitor__email', 'id_post__id_post', 'abertura_dia', 'abertura_hora')
+    ordering = ('leitor', 'id_post', 'abertura_dia', 'abertura_hora')
 
 admin.site.register(Acessos, AcessosAdmin)
 
 class UTMAdmin(admin.ModelAdmin):
-    list_display=('utm_source', 'utm_medium', 'utm_campaign', 'utm_channel', 'utm_variaveis')
-    list_display_links=('utm_source', 'utm_medium')
+    list_display=( 'acesso', 'source', 'medium', 'campaign', 'channel' )
+    list_display_links=('acesso' ,'source', 'medium')
     list_per_page = 10
-    list_filter = ('utm_source', 'utm_medium', 'utm_campaign', 'utm_channel')
-    search_fields = ('utm_source', 'utm_medium', 'utm_campaign', 'utm_channel')
-    ordering = ('utm_source', )
+    list_filter = ('source', 'medium', 'campaign', 'channel')
+    search_fields = ('source', 'medium', 'campaign', 'channel')
+    ordering = ('source', )
 
 admin.site.register(UTM, UTMAdmin)

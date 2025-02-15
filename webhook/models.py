@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.validators import EmailValidator
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -8,7 +7,7 @@ class Posts(models.Model):
     id_post = models.IntegerField(db_index=True, primary_key=True)
 
     def __str__(self):
-        return self.id_post
+        return f'{self.id_post}'
 
 class Acessos(models.Model):
     leitor = models.ForeignKey(
@@ -21,17 +20,21 @@ class Acessos(models.Model):
         on_delete=models.CASCADE,
         related_name='acessos'
     )
-    abertura = models.DateTimeField(db_index=True)
+    abertura_dia = models.DateField(db_index=True)
+    abertura_hora = models.TimeField(db_index=True)
+    abertura_dia_semana = models.IntegerField(db_index=True)
 
     class Meta:
         indexes = [
-            models.Index(fields=['leitor', 'abertura']),
-            models.Index(fields=['id_post', 'abertura'])
+            models.Index(fields=['leitor', 'abertura_dia']),
+            models.Index(fields=['leitor', 'abertura_hora']),
+            models.Index(fields=['id_post', 'abertura_dia']),
+            models.Index(fields=['id_post', 'abertura_hora'])
         ]
     
 
     def __str__(self):
-        return f'Acesso de {self.email.email} a {self.id_post.id_post} em {self.abertura}.'
+        return f'Acesso de {self.leitor.email} a {self.id_post.id_post} em {self.abertura_dia}.'
     
 class UTM(models.Model):
     acesso = models.ForeignKey(
@@ -39,11 +42,10 @@ class UTM(models.Model):
         on_delete=models.CASCADE,
         related_name='utms'
     )
-    utm_source = models.CharField(max_length=50, db_index=True)
-    utm_medium = models.CharField(max_length=50, db_index=True)
-    utm_campaign = models.CharField(max_length=50, db_index=True)
-    utm_channel = models.CharField(max_length=50, db_index=True)
-    utm_variaveis = models.JSONField() 
+    source = models.CharField(max_length=50, db_index=True, null=True, default=None)
+    medium = models.CharField(max_length=50, db_index=True, null=True, default=None)
+    campaign = models.CharField(max_length=50, db_index=True, null=True, default=None)
+    channel = models.CharField(max_length=50, db_index=True, null=True, default=None) 
 
     def __str__(self):
-        return f'UTM de {self.acesso.leitor.email} no post {self.acesso.id_post.id_post} em {self.acesso.abertura}'
+        return f'UTM de {self.acesso.leitor.email} no post {self.acesso.id_post.id_post} em {self.acesso.abertura_dia}'
