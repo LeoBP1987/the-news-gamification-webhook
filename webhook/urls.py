@@ -11,5 +11,6 @@ router.register('utms', UTMViewSet, basename='UTMs')
 urlpatterns = [
     path('', include(router.urls)),
     path('acessos/<str:dataInicial>/<str:dataFinal>/data/', AcessosPorPeriodoViewSet.as_view()),
-    path('webhook/', WebhookViewSet.as_view())
+    path('webhook/', WebhookViewSet.as_view()),
+    path('oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider'))
 ]
