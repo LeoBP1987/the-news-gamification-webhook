@@ -16,17 +16,12 @@ class UserSerializers(serializers.ModelSerializer):
 class PostsSerializers(serializers.ModelSerializer):
     class Meta:
         model = Posts
-        fields = ('id_post', )
+        fields = ('id', )
 
 class AcessosSerializers(serializers.ModelSerializer):
     class Meta:
         model = Acessos
-        fields = ('id', 'leitor', 'id_post', 'abertura_dia', 'abertura_hora')
-
-class AcessoPorPeriodoSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Acessos
-        fields = ('id', 'leitor', 'id_post', 'abertura_hora')
+        fields = ('id', 'leitor', 'post', 'abertura_dia', 'abertura_hora', 'abertura_dia_semana')
 
 class UTMSerializers(serializers.ModelSerializer):
     class Meta:

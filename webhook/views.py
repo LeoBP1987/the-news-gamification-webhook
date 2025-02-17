@@ -1,12 +1,13 @@
 from rest_framework import viewsets, filters, status, generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from webhook.permissions import GroupPermissions
 from django.contrib.auth.models import User, Group
 from rest_framework.response import Response
 from datetime import datetime
 from webhook.models import Posts, Acessos, UTM
-from webhook.serializers import PostsSerializers, AcessosSerializers, AcessoPorPeriodoSerializers, UTMSerializers, \
-                                UserSerializers
+from webhook.serializers import PostsSerializers, AcessosSerializers, UTMSerializers, UserSerializers
 from django_filters.rest_framework import DjangoFilterBackend
+from webhook.utils import gerar_senha, custon_permission_denied
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -21,6 +22,10 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     ordering_fields = ['grupo', 'username']
     search_fields = ['grupo', 'username']
+    permission_classes = [IsAuthenticated, GroupPermissions]
+
+    def permission_denied(self, request, message=None, code=None):
+        return custon_permission_denied(message)    
 
 class PostsViewSet(viewsets.ModelViewSet):
     """
@@ -30,10 +35,14 @@ class PostsViewSet(viewsets.ModelViewSet):
     instâncias do modelo Posts. Os posts podem ser filtrados e ordenados
     com base em seu ID.
     """
-    queryset = Posts.objects.all().order_by('id_post')
+    queryset = Posts.objects.all().order_by('id')
     serializer_class = PostsSerializers
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    ordering_fields = ['id_post', ]
+    ordering_fields = ['id', ]
+    permission_classes = [IsAuthenticated, GroupPermissions]
+
+    def permission_denied(self, request, message=None, code=None):
+        return custon_permission_denied(message)
 
 class AcessosViewSet(viewsets.ModelViewSet):
     """
@@ -46,9 +55,13 @@ class AcessosViewSet(viewsets.ModelViewSet):
     queryset = Acessos.objects.all().order_by('leitor')
     serializer_class = AcessosSerializers
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
-    filterset_fields = ['leitor', 'id_post', 'abertura_dia']
-    ordering_fields = ['leitor', 'id_post', 'abertura_dia']
-    search_fields = ['leitor', 'id_post', 'abertura_dia']
+    filterset_fields = ['leitor', 'post', 'abertura_dia']
+    ordering_fields = ['leitor', 'post', 'abertura_dia']
+    search_fields = ['leitor', 'post', 'abertura_dia']
+    permission_classes = [IsAuthenticated, GroupPermissions]
+
+    def permission_denied(self, request, message=None, code=None):
+        return custon_permission_denied(message)
         
 class AcessosPorPeriodoViewSet(generics.ListAPIView):
     """
@@ -79,10 +92,14 @@ class AcessosPorPeriodoViewSet(generics.ListAPIView):
         queryset = Acessos.objects.filter(abertura_dia__range=(data_inicial_formatada, data_final_formatada)).order_by('leitor')
         return queryset
     
-    serializer_class = AcessoPorPeriodoSerializers
+    serializer_class = AcessosSerializers
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
-    ordering_fields = ['leitor', 'id_post', 'acessos']
-    search_fields = ['leitor', 'id_post', 'acessos']
+    ordering_fields = ['leitor', 'post', 'acessos']
+    search_fields = ['leitor', 'post', 'acessos']
+    permission_classes = [IsAuthenticated, GroupPermissions]
+
+    def permission_denied(self, request, message=None, code=None):
+        return custon_permission_denied(message)
 
 class UTMViewSet(viewsets.ModelViewSet):
     """
@@ -98,6 +115,10 @@ class UTMViewSet(viewsets.ModelViewSet):
     filterset_fields = ['source', 'medium', 'campaign', 'channel']
     ordering_fields = ['source', 'medium', 'campaign', 'channel']
     search_fields = [ 'source', 'medium', 'campaign', 'channel']
+    permission_classes = [IsAuthenticated, GroupPermissions]
+
+    def permission_denied(self, request, message=None, code=None):
+        return custon_permission_denied(message)
 
 class WebhookViewSet(generics.ListAPIView):
     """
@@ -125,33 +146,37 @@ class WebhookViewSet(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
 
         email = request.query_params.get('email')
-        id_edicao = request.query_params.get('id')
+        id_post_edicao = request.query_params.get('id')
         utm_source = request.query_params.get('utm_source')
         utm_medium = request.query_params.get('utm_medium')
         utm_campaign = request.query_params.get('utm_campaign')
         utm_channel = request.query_params.get('utm_channel')
 
-        if not email or not id_edicao:
+        if not email or not id_post_edicao:
             return Response(
                 {"error": "O email e id são obrigatórios para essa requisição."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         try:
-            leitor, criado = User.objects.get_or_create(username=email, defaults={'email': email})
+            leitor, criado = User.objects.get_or_create(
+                                            username=email, 
+                                            defaults={'email': email},
+                                            password=gerar_senha()
+                                        )
 
             if(criado):
                 grupo = Group.objects.get(name='leitores')
                 leitor.groups.add(grupo)
             
-            id_post = int(id_edicao.replace('post_', ''))
-            post, _ = Posts.objects.get_or_create(id_post=id_post)
+            id_post = int(id_post_edicao.replace('post_', ''))
+            post, _ = Posts.objects.get_or_create(id=id_post)
             acesso = Acessos.objects.create(
                 leitor=leitor,
-                id_post=post,
+                post=post,
                 abertura_dia=datetime.today().date(),
                 abertura_hora= datetime.now().time(),
-                abertura_dia_semana=datetime.today().date().isoweekday()
+                abertura_dia_semana=datetime.today().isoweekday()
             )
 
             if utm_source or utm_medium or utm_campaign or utm_channel:
