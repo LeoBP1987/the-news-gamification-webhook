@@ -16,7 +16,7 @@ class UserSerializers(serializers.ModelSerializer):
 class PostsSerializers(serializers.ModelSerializer):
     class Meta:
         model = Posts
-        fields = ('id', )
+        fields = ('id', 'resource_id' )
 
 class AcessosSerializers(serializers.ModelSerializer):
     class Meta:

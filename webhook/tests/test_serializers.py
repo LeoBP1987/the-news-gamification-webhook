@@ -53,7 +53,7 @@ class SerializersPostsTestCase(TestCase):
 
         dados = self.post.serializer.data
 
-        self.assertEqual(set(dados.keys()), set(['id',]))
+        self.assertEqual(set(dados.keys()), set(['id', 'resource_id']))
 
     def test_verifica_conteudos_serializados_de_posts(self):
         'Teste que verifica o conteudo dos campos serializados do modelo Posts'
@@ -61,6 +61,7 @@ class SerializersPostsTestCase(TestCase):
         dados = self.post.serializer.data
 
         self.assertEqual(dados['id'], self.post.id)
+        self.assertEqual(dados['resource_id'], self.post.resource_id)
 
 class SerializersAcessosTestCase(TestCase):
     '''

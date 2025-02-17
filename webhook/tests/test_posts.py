@@ -50,7 +50,7 @@ class PostsTestCase(APITestCase):
         'Teste que verifica requisição POST para um post'
 
         dados = {
-            "id": 3030,
+            "resource_id": "post_2025-02-17",
         }        
 
         response = self.client.post(self.url, data=dados)

@@ -4,10 +4,10 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Posts(models.Model):
-    id = models.IntegerField(db_index=True, primary_key=True)
+    resource_id = models.CharField(db_index=True)
 
     def __str__(self):
-        return f'{self.id}'
+        return f'{self.resource_id}'
 
 class Acessos(models.Model):
     leitor = models.ForeignKey(
@@ -34,7 +34,7 @@ class Acessos(models.Model):
     
 
     def __str__(self):
-        return f'Acesso de {self.leitor.email} a {self.post.id} em {self.abertura_dia}.'
+        return f'Acesso de {self.leitor.email} a {self.post.resource_id} em {self.abertura_dia}.'
     
 class UTM(models.Model):
     acesso = models.ForeignKey(
@@ -48,4 +48,4 @@ class UTM(models.Model):
     channel = models.CharField(max_length=50, db_index=True, null=True, default=None) 
 
     def __str__(self):
-        return f'UTM de {self.acesso.leitor.email} no post {self.acesso.post.id} em {self.acesso.abertura_dia}'
+        return f'UTM de {self.acesso.leitor.email} no post {self.acesso.post.resource_id} em {self.acesso.abertura_dia}'

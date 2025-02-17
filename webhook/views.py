@@ -38,7 +38,7 @@ class PostsViewSet(viewsets.ModelViewSet):
     queryset = Posts.objects.all().order_by('id')
     serializer_class = PostsSerializers
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    ordering_fields = ['id', ]
+    ordering_fields = ['resource_id', ]
     permission_classes = [IsAuthenticated, GroupPermissions]
 
     def permission_denied(self, request, message=None, code=None):
@@ -146,13 +146,13 @@ class WebhookViewSet(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
 
         email = request.query_params.get('email')
-        id_post_edicao = request.query_params.get('id')
+        resource_id = request.query_params.get('id')
         utm_source = request.query_params.get('utm_source')
         utm_medium = request.query_params.get('utm_medium')
         utm_campaign = request.query_params.get('utm_campaign')
         utm_channel = request.query_params.get('utm_channel')
 
-        if not email or not id_post_edicao:
+        if not email or not resource_id:
             return Response(
                 {"error": "O email e id são obrigatórios para essa requisição."},
                 status=status.HTTP_400_BAD_REQUEST
@@ -169,8 +169,7 @@ class WebhookViewSet(generics.ListAPIView):
                 grupo = Group.objects.get(name='leitores')
                 leitor.groups.add(grupo)
             
-            id_post = int(id_post_edicao.replace('post_', ''))
-            post, _ = Posts.objects.get_or_create(id=id_post)
+            post, _ = Posts.objects.get_or_create(resource_id=resource_id)
             acesso = Acessos.objects.create(
                 leitor=leitor,
                 post=post,

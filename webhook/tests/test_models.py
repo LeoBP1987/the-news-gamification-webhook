@@ -37,13 +37,13 @@ class ModelPostsTestCase(TestCase):
     '''
     def setUp(self):
         self.posts = Posts.objects.create(
-            id = 1010
+            resource_id = 'post_2025-02-17'
         )
 
     def test_verifica_atributo_modelo_posts(self):
         'Teste que verifica os atributos do modelo Posts'
 
-        self.assertEqual(self.posts.id, 1010)
+        self.assertEqual(self.posts.resource_id, 'post_2025-02-17')
 
 class ModelAcessosTestCase(TestCase):
     '''
@@ -62,7 +62,7 @@ class ModelAcessosTestCase(TestCase):
         )
 
         self.posts = Posts.objects.create(
-            id = 1010
+            resource_id = 'post_2025-02-17'
         )
         
         self.abertura = datetime.today()
@@ -101,7 +101,7 @@ class ModelUTMTestCase(TestCase):
         )
 
         self.posts = Posts.objects.create(
-            id = 1010
+            resource_id = 'post_2025-02-17'
         )
         
         self.abertura = datetime.today()

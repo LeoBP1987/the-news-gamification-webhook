@@ -2,12 +2,12 @@ from django.contrib import admin
 from webhook.models import Posts, Acessos, UTM
 
 class PostsAdmin(admin.ModelAdmin):
-    list_display= ('id', )
-    list_display_links= ('id', )
+    list_display= ('id', 'resource_id' )
+    list_display_links= ('id', 'resource_id' )
     list_per_page = 10
-    list_filter = ('id', )
-    search_fields = ('id', )
-    ordering = ('id', )
+    list_filter = ('id', 'resource_id' )
+    search_fields = ('id', 'resource_id' )
+    ordering = ('id', 'resource_id' )
 
 admin.site.register(Posts, PostsAdmin)
 
