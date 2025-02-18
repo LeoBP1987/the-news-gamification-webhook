@@ -172,11 +172,16 @@ class WebhookViewSet(generics.ListAPIView):
                 leitor.groups.add(grupo)
             
             post, _ = Posts.objects.get_or_create(resource_id=resource_id)
+
+            hora_atual = datetime.now().time()
+            hora_formatada = hora_atual.strftime("%H:%M:%S")
+            hora = datetime.strptime(hora_formatada, "%H:%M:%S").time()
+
             acesso = Acessos.objects.create(
                 leitor=leitor,
                 post=post,
                 abertura_dia=datetime.today().date(),
-                abertura_hora= datetime.now().time(),
+                abertura_hora= hora,
                 abertura_dia_semana=datetime.today().isoweekday()
             )
 
