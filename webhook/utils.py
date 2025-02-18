@@ -28,7 +28,8 @@ def obter_horario_postagem(request):
     if ultima_postagem is not None:
         if (ultima_postagem.leitor.email == request.query_params.get('email') and 
             ultima_postagem.post.resource_id == request.query_params.get('id')):
-                if (hora_postagem - ultima_postagem.abertura_hora).total_seconds() < 30:
+                diferenca = (hora_postagem - ultima_postagem.abertura_hora).total_seconds()
+                if diferenca < 30:
                         postar = False
 
     return {'postar': postar, 'dia': dia_postagem, 'dia_semana': dia_semana_postagem, 'hora': hora_postagem}
