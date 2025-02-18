@@ -67,11 +67,15 @@ class ModelAcessosTestCase(TestCase):
         
         self.abertura = datetime.today()
 
+        hora_atual = self.abertura.time()
+        hora_formatada = hora_atual.strftime("%H:%M:%S")
+        self.hora = datetime.strptime(hora_formatada, "%H:%M:%S").time()
+
         self.acessos = Acessos.objects.create(
             leitor = self.usuario,
             post = self.posts,
             abertura_dia = self.abertura.date(),
-            abertura_hora = self.abertura.time(),
+            abertura_hora = self.hora,
             abertura_dia_semana = self.abertura.isoweekday()
         )
 
@@ -81,7 +85,7 @@ class ModelAcessosTestCase(TestCase):
         self.assertEqual(self.acessos.leitor.username, self.usuario.username)
         self.assertEqual(self.acessos.post.id, self.posts.id)
         self.assertEqual(self.acessos.abertura_dia, self.abertura.date())
-        self.assertEqual(self.acessos.abertura_hora, self.abertura.time())
+        self.assertEqual(self.acessos.abertura_hora, self.hora)
         self.assertEqual(self.acessos.abertura_dia_semana, self.abertura.isoweekday())
 
 class ModelUTMTestCase(TestCase):
@@ -106,11 +110,15 @@ class ModelUTMTestCase(TestCase):
         
         self.abertura = datetime.today()
 
+        hora_atual = self.abertura.time()
+        hora_formatada = hora_atual.strftime("%H:%M:%S")
+        self.hora = datetime.strptime(hora_formatada, "%H:%M:%S").time()
+
         self.acessos = Acessos.objects.create(
             leitor = self.usuario,
             post = self.posts,
             abertura_dia = self.abertura.date(),
-            abertura_hora = self.abertura.time(),
+            abertura_hora = self.hora,
             abertura_dia_semana = self.abertura.isoweekday()
         )
 
