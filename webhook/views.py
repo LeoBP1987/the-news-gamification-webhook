@@ -9,7 +9,7 @@ from datetime import datetime
 from webhook.models import Posts, Acessos, UTM
 from webhook.serializers import PostsSerializers, AcessosSerializers, UTMSerializers, UserSerializers
 from django_filters.rest_framework import DjangoFilterBackend
-from webhook.utils import gerar_senha, custon_permission_denied
+from webhook.utils import gerar_senha, custon_permission_denied, obter_horario_postagem
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -174,16 +174,20 @@ class WebhookViewSet(generics.ListAPIView):
             
             post, _ = Posts.objects.get_or_create(resource_id=resource_id)
 
-            hora_atual = datetime.now().time()
-            hora_formatada = hora_atual.strftime("%H:%M:%S")
-            hora = datetime.strptime(hora_formatada, "%H:%M:%S").time()
+            horario = obter_horario_postagem(request)
+
+            if not horario['postar']:
+                return Response(
+                        {"error": "Requisição já processada."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
 
             acesso = Acessos.objects.create(
                 leitor=leitor,
                 post=post,
-                abertura_dia=datetime.today().date(),
-                abertura_hora= hora,
-                abertura_dia_semana=datetime.today().isoweekday()
+                abertura_dia=horario['dia'],
+                abertura_hora= horario['hora'],
+                abertura_dia_semana=horario['dia_semana']
             )
 
             if acesso and (utm_source or utm_medium or utm_campaign or utm_channel):
