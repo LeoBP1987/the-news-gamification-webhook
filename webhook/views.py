@@ -3,6 +3,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from webhook.permissions import GroupPermissions
 from django.contrib.auth.models import User, Group
 from rest_framework.response import Response
+from django.contrib.auth.hashers import make_password
 from datetime import datetime
 from webhook.models import Posts, Acessos, UTM
 from webhook.serializers import PostsSerializers, AcessosSerializers, UTMSerializers, UserSerializers
@@ -161,8 +162,9 @@ class WebhookViewSet(generics.ListAPIView):
         try:
             leitor, criado = User.objects.get_or_create(
                                             username=email, 
-                                            defaults={'email': email},
-                                            password=gerar_senha()
+                                            defaults={'email': email,
+                                                      'password': make_password(gerar_senha())
+                                                      },                                       
                                         )
 
             if(criado):
@@ -178,7 +180,7 @@ class WebhookViewSet(generics.ListAPIView):
                 abertura_dia_semana=datetime.today().isoweekday()
             )
 
-            if utm_source or utm_medium or utm_campaign or utm_channel:
+            if acesso and (utm_source or utm_medium or utm_campaign or utm_channel):
                 UTM.objects.create(
                     acesso=acesso,
                     source=utm_source,

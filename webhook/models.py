@@ -32,6 +32,9 @@ class Acessos(models.Model):
             models.Index(fields=['post', 'abertura_hora'])
         ]
     
+    class Meta:
+        
+        unique_together = ('leitor', 'post', 'abertura_dia', 'abertura_hora')
 
     def __str__(self):
         return f'Acesso de {self.leitor.email} a {self.post.resource_id} em {self.abertura_dia}.'
