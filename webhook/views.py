@@ -2,6 +2,7 @@ from rest_framework import viewsets, filters, status, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from webhook.permissions import GroupPermissions
 from django.contrib.auth.models import User, Group
+from django.db import IntegrityError
 from rest_framework.response import Response
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
@@ -196,6 +197,11 @@ class WebhookViewSet(generics.ListAPIView):
             return Response(
                 {"message": "Dados salvos com sucesso."},
                 status=status.HTTP_201_CREATED
+            )
+        except IntegrityError:
+            return Response(
+                {"error": "Requisição já processada."},
+                status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             return Response(
